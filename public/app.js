@@ -214,6 +214,44 @@ function connectWS() {
   };
 }
 
+// --- Fullscreen ---
+const fullscreenBtn = document.getElementById('fullscreen-toggle');
+
+function isFullscreen() {
+  return Boolean(document.fullscreenElement);
+}
+
+function enterFullscreen() {
+  if (!isFullscreen() && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    document.exitFullscreen();
+  } else {
+    enterFullscreen();
+  }
+}
+
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', () => {
+    fullscreenBtn.textContent = isFullscreen() ? '⤡' : '⛶';
+  });
+}
+
+// TVs are usually driven by remote/touch rather than a precise click on a
+// small button, so the first tap/click anywhere also requests fullscreen.
+document.addEventListener(
+  'click',
+  () => {
+    enterFullscreen();
+  },
+  { once: true }
+);
+
 function tickClock() {
   const now = new Date();
   clockEl.textContent = now.toLocaleString([], {

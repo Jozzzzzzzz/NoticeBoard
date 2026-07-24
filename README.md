@@ -36,6 +36,17 @@ for the phone/PC view.
 Copy `.env.example` to `.env` if you want to set an API token or configure
 Google Calendar (both optional — the app works with neither set).
 
+## Fullscreen on the TV
+
+The TV view has a ⛶ button (and the first tap/click anywhere also
+triggers it) to enter the browser's fullscreen mode — works fine for
+casual use but still shows the browser's fullscreen exit hint briefly.
+
+For a permanent TV setup, use true kiosk mode instead — no address bar,
+no browser chrome at all: run `scripts/launch-tv-kiosk.bat`, or use the
+**"NoticeBoard TV (Fullscreen)"** desktop shortcut. Edit the `NB_URL` line
+in that script if the server's address changes.
+
 ## Command syntax
 
 Both styles are understood by `/api/command` and the on-page command bar:
