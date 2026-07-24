@@ -18,15 +18,30 @@ function fmtDate(iso) {
   return `${d}/${m}/${y}`;
 }
 
+const TYPE_ICON = { note: '📝', task: '✅', idea: '💡' };
+
+function hashId(id) {
+  let h = 0;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
 function renderItems() {
   if (!items.length) {
     itemsEl.innerHTML = `<div class="empty-state">Nothing yet — add something above</div>`;
     return;
   }
   itemsEl.innerHTML = items
-    .map(
-      (i) => `
-    <div class="item-row ${i.type} ${i.done ? 'done' : ''}" data-id="${i.id}">
+    .map((i) => {
+      const h = hashId(i.id);
+      const swatch = h % 6;
+      const rotation = ((h >> 3) % 5) - 2; // subtle -2..2 deg, keeps buttons easy to hit
+      const icon = TYPE_ICON[i.type] || '📌';
+      return `
+    <div class="item-row swatch-${swatch} ${i.done ? 'done' : ''}" data-id="${i.id}" style="transform: rotate(${rotation}deg);">
+      <div class="tape"></div>
+      <div class="item-icon">${icon}</div>
       <div class="item-main">
         <div class="item-heading">${escapeHtml(i.heading)}</div>
         <div class="item-meta">
@@ -35,8 +50,8 @@ function renderItems() {
       </div>
       ${i.done ? '' : `<button data-action="complete">Done</button>`}
       <button data-action="delete" class="danger">Delete</button>
-    </div>`
-    )
+    </div>`;
+    })
     .join('');
   itemsEl.querySelectorAll('.item-row[data-id]').forEach((el) => {
     el.style.viewTransitionName = `item-${el.dataset.id}`;

@@ -3,16 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="/theme.js"></script>
   <title>NoticeBoard</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <div id="app">
     <header>
       <h1>NoticeBoard</h1>
-      <div>
+      <div class="header-right">
         <span id="conn-dot" class="conn-dot"></span>
         <span class="clock" id="clock"></span>
+        <button id="theme-toggle" class="theme-toggle" title="Toggle light/dark">🌓</button>
       </div>
     </header>
     <nav id="nav"></nav>

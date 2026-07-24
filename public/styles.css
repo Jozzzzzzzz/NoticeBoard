@@ -1,27 +1,40 @@
+:root,
+:root[data-theme="dark"] {
+  --page-bg: #15151f;
+  --page-bg-2: #1c1c29;
+  --header-text: #f2f2f7;
+  --header-text-dim: #a5a5b8;
+  --nav-chip: rgba(255,255,255,0.08);
+  --nav-chip-border: rgba(255,255,255,0.12);
+  --nav-chip-active-text: #15151f;
+  --tape: rgba(220,220,230,0.55);
+  --shadow: rgba(0,0,0,0.45);
+}
+
+:root[data-theme="light"] {
+  --page-bg: #eef0f4;
+  --page-bg-2: #e2e5ec;
+  --header-text: #1c1c29;
+  --header-text-dim: #5a5a6b;
+  --nav-chip: rgba(0,0,0,0.05);
+  --nav-chip-border: rgba(0,0,0,0.1);
+  --nav-chip-active-text: #15151f;
+  --tape: rgba(80,80,90,0.35);
+  --shadow: rgba(0,0,0,0.2);
+}
+
 :root {
-  --board-1: #6b5a33;
-  --board-2: #5a6b3a;
-  --board-3: #4a5a2e;
-  --board-dark: #33421f;
-  --frame: #3e2f1c;
-  --frame-light: #6b4f2c;
+  --danger: #ef4a5f;
+  --ok: #34d399;
 
-  --note-cream: #f5eed2;
-  --note-cream-shadow: #d8cca0;
-  --note-yellow: #f7e28a;
-  --note-yellow-shadow: #d9bf5a;
-  --note-green: #d7edc0;
-  --note-green-shadow: #aecf8e;
-
-  --pin-note: #3a7bd5;
-  --pin-task: #d5453a;
-  --pin-idea: #3ab54a;
-
-  --text-ink: #3a2f1e;
-  --text-ink-dim: #6b5c42;
-  --danger: #c23b2e;
-
-  --header-text: #f3ecd6;
+  /* Vivid sticky-note swatches. Assigned per-item via a stable hash, not
+     tied to type — the "random colour" cork-board-alternative look. */
+  --swatch-0-bg: #6c3ce9; --swatch-0-text: #ffffff; /* purple */
+  --swatch-1-bg: #2f6bff; --swatch-1-text: #ffffff; /* blue */
+  --swatch-2-bg: #fbd7e0; --swatch-2-text: #33212a; /* pale pink */
+  --swatch-3-bg: #ef4a5f; --swatch-3-text: #ffffff; /* red */
+  --swatch-4-bg: #ffc93c; --swatch-4-text: #332a06; /* yellow */
+  --swatch-5-bg: #ff5fc4; --swatch-5-text: #ffffff; /* magenta */
 }
 
 * { box-sizing: border-box; }
@@ -32,179 +45,104 @@ html, body {
   height: 100vh;
   overflow: hidden;
   font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--header-text);
 }
 
 body {
-  background-color: var(--board-2);
-  background-image:
-    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.05), transparent 40%),
-    radial-gradient(ellipse at 80% 85%, rgba(0,0,0,0.15), transparent 45%),
-    repeating-radial-gradient(circle at 0 0, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 2px, transparent 6px),
-    repeating-radial-gradient(circle at 3px 4px, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 2px, transparent 7px),
-    linear-gradient(135deg, var(--board-1) 0%, var(--board-2) 45%, var(--board-3) 100%);
-  background-blend-mode: normal, normal, overlay, overlay, normal;
+  background: radial-gradient(ellipse at 30% 0%, var(--page-bg-2), var(--page-bg) 60%);
+  color: var(--header-text);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  border: 18px solid var(--frame);
-  border-image: linear-gradient(155deg, var(--frame-light), var(--frame) 40%, #22190f 100%) 1;
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
 }
 
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px 0 40px;
+  padding: 28px 48px 0 48px;
 }
 
 header h1 {
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  font-size: 2.6rem;
-  font-weight: 700;
+  font-size: 2.3rem;
+  font-weight: 800;
   margin: 0;
-  color: var(--header-text);
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 header .clock {
-  font-size: 1.4rem;
-  color: var(--header-text);
-  opacity: 0.85;
+  font-size: 1.3rem;
+  color: var(--header-text-dim);
   font-variant-numeric: tabular-nums;
 }
 
+.theme-toggle {
+  border: 1px solid var(--nav-chip-border);
+  background: var(--nav-chip);
+  color: var(--header-text);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.theme-toggle:hover { transform: scale(1.08); }
+
 nav {
   display: flex;
-  gap: 14px;
-  padding: 18px 40px 0 40px;
+  gap: 12px;
+  padding: 20px 48px 0 48px;
 }
 
 nav .tab {
-  padding: 8px 22px;
-  border-radius: 4px;
-  color: var(--header-text);
+  padding: 8px 20px;
+  border-radius: 999px;
+  color: var(--header-text-dim);
   font-size: 1.05rem;
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.15);
+  font-weight: 600;
+  background: var(--nav-chip);
+  border: 1px solid var(--nav-chip-border);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 nav .tab.active {
-  background: var(--note-yellow);
-  color: var(--text-ink);
-  border-color: var(--note-yellow-shadow);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+  color: var(--nav-chip-active-text);
+  background: var(--swatch-4-bg);
+  border-color: var(--swatch-4-bg);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
 }
 
 main {
   flex: 1;
-  padding: 36px 44px 50px 44px;
+  padding: 30px 48px 60px 48px;
   overflow-y: auto;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 46px 36px;
-  padding-top: 10px;
+/* --- Stacked sticky-note layout --- */
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 18px 0 0 26px;
 }
 
-/* --- Pinned note cards --- */
-.card {
-  position: relative;
-  background: var(--note-cream);
-  color: var(--text-ink);
-  border-radius: 2px;
-  padding: 26px 20px 22px 20px;
-  box-shadow:
-    0 10px 18px rgba(0,0,0,0.35),
-    0 2px 4px rgba(0,0,0,0.25);
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
-}
-
-.card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 22px;
-  height: 22px;
-  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.18) 50%);
-}
-
-.card:nth-of-type(3n+1) { transform: rotate(-3deg); }
-.card:nth-of-type(3n+2) { transform: rotate(2deg); }
-.card:nth-of-type(3n) { transform: rotate(-1.5deg); }
-.card:nth-of-type(4n) { transform: rotate(3.5deg); }
-
-.card .pin {
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.35), inset 2px 2px 4px rgba(255,255,255,0.5);
-}
-
-.card.note { background: var(--note-cream); }
-.card.note .pin { background: radial-gradient(circle at 35% 30%, #6fa3e8, var(--pin-note)); }
-
-.card.task { background: var(--note-yellow); }
-.card.task .pin { background: radial-gradient(circle at 35% 30%, #e8776c, var(--pin-task)); }
-
-.card.idea { background: var(--note-green); }
-.card.idea .pin { background: radial-gradient(circle at 35% 30%, #6fd583, var(--pin-idea)); }
-
-.card.done { opacity: 0.55; }
-.card.done .heading { text-decoration: line-through; }
-
-.card .type-tag {
-  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-ink-dim);
-  margin-bottom: 6px;
-}
-
-.card .heading {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 6px 0;
-  line-height: 1.15;
-}
-
-.card .body {
-  color: var(--text-ink-dim);
-  font-size: 1.05rem;
-  line-height: 1.3;
-}
-
-.card .checkin {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--danger);
-}
-
-.empty-state {
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  color: var(--header-text);
-  opacity: 0.75;
-  font-size: 1.4rem;
-  padding-top: 60px;
-  text-align: center;
+.stack .card {
+  margin: 0 -34px 40px 0;
 }
 
 .overview-columns {
@@ -215,34 +153,121 @@ main {
 }
 
 .overview-columns h2 {
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  font-size: 1.4rem;
-  color: var(--header-text);
-  text-shadow: 0 2px 3px rgba(0,0,0,0.4);
-  margin: 0 0 18px 4px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--header-text-dim);
+  margin: 0 0 20px 6px;
 }
 
 .overview-columns .col {
   display: flex;
   flex-direction: column;
-  gap: 40px;
   overflow-y: auto;
-  padding: 6px;
+  padding: 10px 4px 20px 4px;
 }
 
-.calendar-list .card { border-left: none; }
+.overview-columns .col .card {
+  margin: 0 0 -30px 0;
+}
+
+.overview-columns .col .card:last-child { margin-bottom: 20px; }
+
+/* --- The sticky note card itself --- */
+.card {
+  position: relative;
+  width: 230px;
+  min-height: 150px;
+  border-radius: 10px;
+  padding: 26px 18px 18px 18px;
+  box-shadow: 0 12px 22px var(--shadow), 0 3px 6px var(--shadow);
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, z-index 0s;
+}
+
+.card:hover {
+  transform: rotate(0deg) translateY(-10px) scale(1.05) !important;
+  box-shadow: 0 20px 30px var(--shadow), 0 6px 10px var(--shadow);
+  z-index: 999 !important;
+}
+
+.card .tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 64px;
+  height: 22px;
+  background: var(--tape);
+  transform: translateX(-50%) rotate(-3deg);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+.card .icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 1.3rem;
+  opacity: 0.85;
+}
+
+.card.done { opacity: 0.5; }
+.card.done .heading { text-decoration: line-through; }
+
+.card .type-tag {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.card .heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+  padding-right: 26px;
+}
+
+.card .body {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+.card .checkin {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+/* Swatch color assignment, applied via class on each card */
+.card.swatch-0 { background: var(--swatch-0-bg); color: var(--swatch-0-text); }
+.card.swatch-1 { background: var(--swatch-1-bg); color: var(--swatch-1-text); }
+.card.swatch-2 { background: var(--swatch-2-bg); color: var(--swatch-2-text); }
+.card.swatch-3 { background: var(--swatch-3-bg); color: var(--swatch-3-text); }
+.card.swatch-4 { background: var(--swatch-4-bg); color: var(--swatch-4-text); }
+.card.swatch-5 { background: var(--swatch-5-bg); color: var(--swatch-5-text); }
+
+.empty-state {
+  color: var(--header-text-dim);
+  font-size: 1.3rem;
+  padding-top: 60px;
+  text-align: center;
+  width: 100%;
+}
 
 .conn-dot {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--danger);
   display: inline-block;
   margin-right: 8px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
 }
 
-.conn-dot.connected { background: var(--pin-idea); }
+.conn-dot.connected { background: var(--ok); }
 
 /* --- Smooth animated transitions (page switches, cards appearing/
    disappearing/updating) via the View Transitions API. Chrome/Edge only —
@@ -260,11 +285,11 @@ main {
 }
 
 @keyframes nb-enter {
-  from { opacity: 0; transform: scale(0.92) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.9) translateY(14px) rotate(-3deg); }
+  to { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
 }
 
 @keyframes nb-exit {
   from { opacity: 1; transform: scale(1) rotate(0deg); }
-  to { opacity: 0; transform: scale(0.9) rotate(-4deg); }
+  to { opacity: 0; transform: scale(0.88) rotate(-6deg); }
 }

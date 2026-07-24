@@ -28,13 +28,31 @@ function fmtDate(iso) {
   return `${d}/${m}/${y}`;
 }
 
-function card(item) {
+const TYPE_ICON = { note: '📝', task: '✅', idea: '💡' };
+
+// Deterministic hash so each item always gets the same color/rotation
+// across re-renders, without needing to store it anywhere.
+function hashId(id) {
+  let h = 0;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function card(item, index = 0) {
   const checkin = item.checkin_date
     ? `<div class="checkin">Check in by ${fmtDate(item.checkin_date)}</div>`
     : '';
+  const h = hashId(item.id);
+  const swatch = h % 6;
+  const rotation = ((h >> 3) % 9) - 4; // -4..4 deg
+  const icon = TYPE_ICON[item.type] || '📌';
+
   return `
-    <div class="card ${item.type} ${item.done ? 'done' : ''}" data-id="${item.id}">
-      <div class="pin"></div>
+    <div class="card swatch-${swatch} ${item.done ? 'done' : ''}" data-id="${item.id}"
+         style="transform: rotate(${rotation}deg); z-index: ${index + 1};">
+      <div class="tape"></div>
+      <div class="icon">${icon}</div>
       <div class="type-tag">${item.type}</div>
       <div class="heading">${escapeHtml(item.heading)}</div>
       ${item.body ? `<div class="body">${escapeHtml(item.body)}</div>` : ''}
@@ -92,23 +110,38 @@ function renderPageInner() {
       .filter((i) => i.checkin_date)
       .sort((a, b) => a.checkin_date.localeCompare(b.checkin_date));
 
-    const googleCards = calendarEvents.map(
-      (e) => `
-      <div class="card note">
-        <div class="pin"></div>
-        <div class="type-tag">google calendar</div>
-        <div class="heading">${escapeHtml(e.heading)}</div>
-        <div class="checkin">${e.allDay ? e.start : new Date(e.start).toLocaleString([], { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
-      </div>`
-    );
+    const localCards = listOrEmptyRaw(withDates);
 
-    const combined = [...listOrEmptyRaw(withDates), ...googleCards].join('');
-    mainEl.innerHTML = `<div class="grid calendar-list">${combined || `<div class="empty-state">Nothing here yet</div>`}</div>`;
+    const googleCards = calendarEvents.map((e, i) => {
+      const h = hashId(e.id);
+      const swatch = h % 6;
+      const rotation = ((h >> 3) % 9) - 4;
+      const when = e.allDay
+        ? e.start
+        : new Date(e.start).toLocaleString([], {
+            weekday: 'short',
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+      return `
+        <div class="card swatch-${swatch}" style="transform: rotate(${rotation}deg); z-index: ${localCards.length + i + 1};">
+          <div class="tape"></div>
+          <div class="icon">📅</div>
+          <div class="type-tag">google calendar</div>
+          <div class="heading">${escapeHtml(e.heading)}</div>
+          <div class="checkin">${when}</div>
+        </div>`;
+    });
+
+    const combined = [...localCards, ...googleCards].join('');
+    mainEl.innerHTML = `<div class="stack calendar-list">${combined || `<div class="empty-state">Nothing here yet</div>`}</div>`;
     return;
   }
 
   const typeForPage = { tasks: 'task', ideas: 'idea' }[currentPage];
-  mainEl.innerHTML = `<div class="grid">${listOrEmpty(byType(typeForPage))}</div>`;
+  mainEl.innerHTML = `<div class="stack">${listOrEmpty(byType(typeForPage))}</div>`;
 }
 
 function renderPage() {
@@ -122,11 +155,11 @@ function updateView() {
 
 function listOrEmpty(list) {
   if (!list.length) return `<div class="empty-state">Nothing here yet</div>`;
-  return list.map(card).join('');
+  return list.map((item, i) => card(item, i)).join('');
 }
 
 function listOrEmptyRaw(list) {
-  return list.map(card);
+  return list.map((item, i) => card(item, i));
 }
 
 async function loadCalendarEvents() {
