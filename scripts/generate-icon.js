@@ -86,8 +86,8 @@ function makeIco(pngBuf, size) {
   return Buffer.concat([header, entry, pngBuf]);
 }
 
-const bg = [11, 13, 16]; // matches --bg
-const accent = [79, 163, 255]; // matches --accent
+const bg = [90, 107, 58]; // matches --board-2 (cork green)
+const accent = [247, 226, 138]; // matches --note-yellow
 
 const outDir = path.join(__dirname, '..', 'public', 'icons');
 fs.mkdirSync(outDir, { recursive: true });

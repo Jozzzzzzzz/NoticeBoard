@@ -1,14 +1,27 @@
 :root {
-  --bg: #0b0d10;
-  --bg-card: #161a1f;
-  --border: #262c33;
-  --text: #eef1f4;
-  --text-dim: #8a92a0;
-  --accent: #4fa3ff;
-  --accent-task: #ffb84f;
-  --accent-idea: #7ee08a;
-  --accent-note: #4fa3ff;
-  --danger: #ff5f5f;
+  --board-1: #6b5a33;
+  --board-2: #5a6b3a;
+  --board-3: #4a5a2e;
+  --board-dark: #33421f;
+  --frame: #3e2f1c;
+  --frame-light: #6b4f2c;
+
+  --note-cream: #f5eed2;
+  --note-cream-shadow: #d8cca0;
+  --note-yellow: #f7e28a;
+  --note-yellow-shadow: #d9bf5a;
+  --note-green: #d7edc0;
+  --note-green-shadow: #aecf8e;
+
+  --pin-note: #3a7bd5;
+  --pin-task: #d5453a;
+  --pin-idea: #3ab54a;
+
+  --text-ink: #3a2f1e;
+  --text-ink-dim: #6b5c42;
+  --danger: #c23b2e;
+
+  --header-text: #f3ecd6;
 }
 
 * { box-sizing: border-box; }
@@ -16,114 +29,179 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   height: 100vh;
   overflow: hidden;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--header-text);
+}
+
+body {
+  background-color: var(--board-2);
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.05), transparent 40%),
+    radial-gradient(ellipse at 80% 85%, rgba(0,0,0,0.15), transparent 45%),
+    repeating-radial-gradient(circle at 0 0, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 2px, transparent 6px),
+    repeating-radial-gradient(circle at 3px 4px, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 2px, transparent 7px),
+    linear-gradient(135deg, var(--board-1) 0%, var(--board-2) 45%, var(--board-3) 100%);
+  background-blend-mode: normal, normal, overlay, overlay, normal;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  border: 18px solid var(--frame);
+  border-image: linear-gradient(155deg, var(--frame-light), var(--frame) 40%, #22190f 100%) 1;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
 }
 
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 48px 0 48px;
+  padding: 20px 40px 0 40px;
 }
 
 header h1 {
-  font-size: 2.4rem;
-  font-weight: 600;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 2.6rem;
+  font-weight: 700;
   margin: 0;
+  color: var(--header-text);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  letter-spacing: 0.02em;
 }
 
 header .clock {
-  font-size: 1.6rem;
-  color: var(--text-dim);
+  font-size: 1.4rem;
+  color: var(--header-text);
+  opacity: 0.85;
   font-variant-numeric: tabular-nums;
 }
 
 nav {
   display: flex;
-  gap: 12px;
-  padding: 20px 48px 0 48px;
+  gap: 14px;
+  padding: 18px 40px 0 40px;
 }
 
 nav .tab {
-  padding: 8px 20px;
-  border-radius: 999px;
-  color: var(--text-dim);
-  font-size: 1.1rem;
-  border: 1px solid var(--border);
+  padding: 8px 22px;
+  border-radius: 4px;
+  color: var(--header-text);
+  font-size: 1.05rem;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
 }
 
 nav .tab.active {
-  color: var(--bg);
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--note-yellow);
+  color: var(--text-ink);
+  border-color: var(--note-yellow-shadow);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.35);
 }
 
 main {
   flex: 1;
-  padding: 32px 48px 48px 48px;
+  padding: 36px 44px 50px 44px;
   overflow-y: auto;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 46px 36px;
+  padding-top: 10px;
 }
 
+/* --- Pinned note cards --- */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px 24px;
-  border-left: 5px solid var(--accent-note);
+  position: relative;
+  background: var(--note-cream);
+  color: var(--text-ink);
+  border-radius: 2px;
+  padding: 26px 20px 22px 20px;
+  box-shadow:
+    0 10px 18px rgba(0,0,0,0.35),
+    0 2px 4px rgba(0,0,0,0.25);
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
 }
 
-.card.task { border-left-color: var(--accent-task); }
-.card.idea { border-left-color: var(--accent-idea); }
-.card.note { border-left-color: var(--accent-note); }
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.18) 50%);
+}
 
-.card.done { opacity: 0.45; }
+.card:nth-of-type(3n+1) { transform: rotate(-3deg); }
+.card:nth-of-type(3n+2) { transform: rotate(2deg); }
+.card:nth-of-type(3n) { transform: rotate(-1.5deg); }
+.card:nth-of-type(4n) { transform: rotate(3.5deg); }
+
+.card .pin {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.35), inset 2px 2px 4px rgba(255,255,255,0.5);
+}
+
+.card.note { background: var(--note-cream); }
+.card.note .pin { background: radial-gradient(circle at 35% 30%, #6fa3e8, var(--pin-note)); }
+
+.card.task { background: var(--note-yellow); }
+.card.task .pin { background: radial-gradient(circle at 35% 30%, #e8776c, var(--pin-task)); }
+
+.card.idea { background: var(--note-green); }
+.card.idea .pin { background: radial-gradient(circle at 35% 30%, #6fd583, var(--pin-idea)); }
+
+.card.done { opacity: 0.55; }
 .card.done .heading { text-decoration: line-through; }
 
 .card .type-tag {
-  font-size: 0.75rem;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  color: var(--text-ink-dim);
   margin-bottom: 6px;
 }
 
 .card .heading {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin: 0 0 6px 0;
+  line-height: 1.15;
 }
 
 .card .body {
-  color: var(--text-dim);
-  font-size: 1rem;
-  line-height: 1.4;
+  color: var(--text-ink-dim);
+  font-size: 1.05rem;
+  line-height: 1.3;
 }
 
 .card .checkin {
   margin-top: 12px;
-  font-size: 0.9rem;
-  color: var(--accent-task);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--danger);
 }
 
 .empty-state {
-  color: var(--text-dim);
-  font-size: 1.3rem;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  color: var(--header-text);
+  opacity: 0.75;
+  font-size: 1.4rem;
   padding-top: 60px;
   text-align: center;
 }
@@ -131,36 +209,36 @@ main {
 .overview-columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 30px;
   height: 100%;
 }
 
 .overview-columns h2 {
-  font-size: 1.2rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 14px 0;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 1.4rem;
+  color: var(--header-text);
+  text-shadow: 0 2px 3px rgba(0,0,0,0.4);
+  margin: 0 0 18px 4px;
 }
 
 .overview-columns .col {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 40px;
   overflow-y: auto;
+  padding: 6px;
 }
 
-.calendar-list .card {
-  border-left-color: var(--accent-task);
-}
+.calendar-list .card { border-left: none; }
 
 .conn-dot {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--danger);
   display: inline-block;
   margin-right: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
 }
 
-.conn-dot.connected { background: var(--accent-idea); }
+.conn-dot.connected { background: var(--pin-idea); }

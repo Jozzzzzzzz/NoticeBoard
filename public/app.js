@@ -34,6 +34,7 @@ function card(item) {
     : '';
   return `
     <div class="card ${item.type} ${item.done ? 'done' : ''}">
+      <div class="pin"></div>
       <div class="type-tag">${item.type}</div>
       <div class="heading">${escapeHtml(item.heading)}</div>
       ${item.body ? `<div class="body">${escapeHtml(item.body)}</div>` : ''}
@@ -74,6 +75,7 @@ function renderPage() {
     const googleCards = calendarEvents.map(
       (e) => `
       <div class="card note">
+        <div class="pin"></div>
         <div class="type-tag">google calendar</div>
         <div class="heading">${escapeHtml(e.heading)}</div>
         <div class="checkin">${e.allDay ? e.start : new Date(e.start).toLocaleString([], { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
