@@ -1,5 +1,7 @@
 node_modules/
 .claude/
+.env
+daemon/
 data/*.db
 data/*.db-journal
 data/*.db-wal

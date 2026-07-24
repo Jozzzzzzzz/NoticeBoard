@@ -1,6 +1,8 @@
 const PAGES = ['overview', 'tasks', 'ideas', 'calendar'];
 let currentPage = 'overview';
 let items = [];
+let calendarEvents = [];
+let calendarLoaded = false;
 
 const navEl = document.getElementById('nav');
 const mainEl = document.getElementById('main');
@@ -63,10 +65,23 @@ function renderPage() {
   }
 
   if (currentPage === 'calendar') {
+    if (!calendarLoaded) loadCalendarEvents();
+
     const withDates = items
       .filter((i) => i.checkin_date)
       .sort((a, b) => a.checkin_date.localeCompare(b.checkin_date));
-    mainEl.innerHTML = `<div class="grid calendar-list">${listOrEmpty(withDates)}</div>`;
+
+    const googleCards = calendarEvents.map(
+      (e) => `
+      <div class="card note">
+        <div class="type-tag">google calendar</div>
+        <div class="heading">${escapeHtml(e.heading)}</div>
+        <div class="checkin">${e.allDay ? e.start : new Date(e.start).toLocaleString([], { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+      </div>`
+    );
+
+    const combined = [...listOrEmptyRaw(withDates), ...googleCards].join('');
+    mainEl.innerHTML = `<div class="grid calendar-list">${combined || `<div class="empty-state">Nothing here yet</div>`}</div>`;
     return;
   }
 
@@ -77,6 +92,23 @@ function renderPage() {
 function listOrEmpty(list) {
   if (!list.length) return `<div class="empty-state">Nothing here yet</div>`;
   return list.map(card).join('');
+}
+
+function listOrEmptyRaw(list) {
+  return list.map(card);
+}
+
+async function loadCalendarEvents() {
+  calendarLoaded = true;
+  try {
+    const res = await fetch('/api/calendar/events');
+    if (!res.ok) return; // not configured, or fetch failed — silently skip
+    const data = await res.json();
+    calendarEvents = data.events || [];
+    if (currentPage === 'calendar') renderPage();
+  } catch {
+    // Google Calendar not reachable — TV page still works with local check-in dates
+  }
 }
 
 function setPage(page) {

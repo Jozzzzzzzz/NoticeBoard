@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../db');
+const { requireToken } = require('../auth');
 
 module.exports = function (broadcast) {
   const router = express.Router();
@@ -21,7 +22,7 @@ module.exports = function (broadcast) {
   });
 
   // POST /api/items
-  router.post('/', (req, res) => {
+  router.post('/', requireToken, (req, res) => {
     const { type = 'note', heading, body = '', checkin_date = null } = req.body;
     if (!heading) return res.status(400).json({ error: 'heading is required' });
 
@@ -35,7 +36,7 @@ module.exports = function (broadcast) {
   });
 
   // PUT /api/items/:id
-  router.put('/:id', (req, res) => {
+  router.put('/:id', requireToken, (req, res) => {
     const existing = db.prepare('SELECT * FROM items WHERE id = ?').get(req.params.id);
     if (!existing) return res.status(404).json({ error: 'not found' });
 
@@ -58,7 +59,7 @@ module.exports = function (broadcast) {
   });
 
   // DELETE /api/items/:id
-  router.delete('/:id', (req, res) => {
+  router.delete('/:id', requireToken, (req, res) => {
     const existing = db.prepare('SELECT * FROM items WHERE id = ?').get(req.params.id);
     if (!existing) return res.status(404).json({ error: 'not found' });
 

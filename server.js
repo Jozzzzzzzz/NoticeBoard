@@ -1,9 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const path = require('path');
 
 const { parseCommand } = require('./commandParser');
+const { requireToken } = require('./auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -20,9 +23,10 @@ function broadcast(payload) {
 }
 
 app.use('/api/items', require('./routes/items')(broadcast));
+app.use('/api/calendar', require('./routes/calendar'));
 
 // POST /api/command  { text: "add note: buy milk" }
-app.post('/api/command', (req, res) => {
+app.post('/api/command', requireToken, (req, res) => {
   const { text } = req.body;
   if (!text || typeof text !== 'string') {
     return res.status(400).json({ error: 'text is required' });

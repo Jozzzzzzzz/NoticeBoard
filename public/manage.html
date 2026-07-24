@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoticeBoard — Manage</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/manage.css" />
+</head>
+<body>
+  <div id="manage-app">
+    <header>
+      <h1>NoticeBoard</h1>
+      <a class="tv-link" href="/">TV view →</a>
+    </header>
+
+    <section class="command-bar">
+      <input id="command-input" type="text" placeholder='Type a command, e.g. add note: buy milk  —or—  add-note -heading "Buy milk" -checkin 25/12/2026' />
+      <button id="mic-btn" title="Speak a command">🎙️</button>
+      <button id="command-send">Send</button>
+    </section>
+    <div id="command-reply" class="command-reply"></div>
+
+    <section class="add-form">
+      <h2>Add item</h2>
+      <form id="item-form">
+        <select id="f-type">
+          <option value="note">Note</option>
+          <option value="task">Task</option>
+          <option value="idea">Idea</option>
+        </select>
+        <input id="f-heading" type="text" placeholder="Heading" required />
+        <input id="f-body" type="text" placeholder="Details (optional)" />
+        <input id="f-checkin" type="date" />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="item-list">
+      <h2>All items</h2>
+      <div id="items"></div>
+    </section>
+  </div>
+  <script src="/api-token.js"></script>
+  <script src="/manage.js"></script>
+</body>
+</html>
