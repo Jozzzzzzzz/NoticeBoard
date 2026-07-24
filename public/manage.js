@@ -38,12 +38,25 @@ function renderItems() {
     </div>`
     )
     .join('');
+  itemsEl.querySelectorAll('.item-row[data-id]').forEach((el) => {
+    el.style.viewTransitionName = `item-${el.dataset.id}`;
+  });
+}
+
+// Animates between list states in Chrome/Edge (item add/remove/reorder);
+// other browsers just update instantly, no error.
+function updateItems() {
+  if (document.startViewTransition) {
+    document.startViewTransition(() => renderItems());
+  } else {
+    renderItems();
+  }
 }
 
 async function loadItems() {
   const res = await fetch('/api/items');
   items = await res.json();
-  renderItems();
+  updateItems();
 }
 
 itemsEl.addEventListener('click', async (e) => {

@@ -94,6 +94,7 @@ nav .tab {
   background: rgba(0,0,0,0.18);
   border: 1px solid rgba(255,255,255,0.15);
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 nav .tab.active {
@@ -242,3 +243,28 @@ main {
 }
 
 .conn-dot.connected { background: var(--pin-idea); }
+
+/* --- Smooth animated transitions (page switches, cards appearing/
+   disappearing/updating) via the View Transitions API. Chrome/Edge only —
+   other browsers just skip straight to the new state, no error. --- */
+::view-transition-group(*) {
+  animation-duration: 0.32s;
+}
+
+::view-transition-new(*) {
+  animation: nb-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(*) {
+  animation: nb-exit 0.22s ease-in;
+}
+
+@keyframes nb-enter {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes nb-exit {
+  from { opacity: 1; transform: scale(1) rotate(0deg); }
+  to { opacity: 0; transform: scale(0.9) rotate(-4deg); }
+}

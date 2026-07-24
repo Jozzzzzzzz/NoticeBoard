@@ -33,13 +33,33 @@ function card(item) {
     ? `<div class="checkin">Check in by ${fmtDate(item.checkin_date)}</div>`
     : '';
   return `
-    <div class="card ${item.type} ${item.done ? 'done' : ''}">
+    <div class="card ${item.type} ${item.done ? 'done' : ''}" data-id="${item.id}">
       <div class="pin"></div>
       <div class="type-tag">${item.type}</div>
       <div class="heading">${escapeHtml(item.heading)}</div>
       ${item.body ? `<div class="body">${escapeHtml(item.body)}</div>` : ''}
       ${checkin}
     </div>`;
+}
+
+// Wraps a DOM update so Chrome/Edge can animate the before/after states
+// (page crossfade, cards fading/scaling in and out) via the View
+// Transitions API. Falls back to an instant update elsewhere.
+function withViewTransition(renderFn) {
+  if (document.startViewTransition) {
+    document.startViewTransition(() => renderFn());
+  } else {
+    renderFn();
+  }
+}
+
+// Tags each rendered card with a stable view-transition-name so the browser
+// can morph/animate matching cards between renders instead of just
+// crossfading the whole page.
+function tagCardTransitionNames() {
+  mainEl.querySelectorAll('.card[data-id]').forEach((el) => {
+    el.style.viewTransitionName = `card-${el.dataset.id}`;
+  });
 }
 
 function escapeHtml(str) {
@@ -52,7 +72,7 @@ function byType(type) {
   return items.filter((i) => i.type === type);
 }
 
-function renderPage() {
+function renderPageInner() {
   renderNav();
 
   if (currentPage === 'overview') {
@@ -91,6 +111,15 @@ function renderPage() {
   mainEl.innerHTML = `<div class="grid">${listOrEmpty(byType(typeForPage))}</div>`;
 }
 
+function renderPage() {
+  renderPageInner();
+  tagCardTransitionNames();
+}
+
+function updateView() {
+  withViewTransition(renderPage);
+}
+
 function listOrEmpty(list) {
   if (!list.length) return `<div class="empty-state">Nothing here yet</div>`;
   return list.map(card).join('');
@@ -107,7 +136,7 @@ async function loadCalendarEvents() {
     if (!res.ok) return; // not configured, or fetch failed — silently skip
     const data = await res.json();
     calendarEvents = data.events || [];
-    if (currentPage === 'calendar') renderPage();
+    if (currentPage === 'calendar') updateView();
   } catch {
     // Google Calendar not reachable — TV page still works with local check-in dates
   }
@@ -116,13 +145,13 @@ async function loadCalendarEvents() {
 function setPage(page) {
   if (!PAGES.includes(page)) return;
   currentPage = page;
-  renderPage();
+  updateView();
 }
 
 async function loadItems() {
   const res = await fetch('/api/items');
   items = await res.json();
-  renderPage();
+  updateView();
 }
 
 function connectWS() {
@@ -144,10 +173,10 @@ function connectWS() {
       const idx = items.findIndex((i) => i.id === msg.item.id);
       if (idx >= 0) items[idx] = msg.item;
       else items.unshift(msg.item);
-      renderPage();
+      updateView();
     } else if (msg.event === 'item_deleted') {
       items = items.filter((i) => i.id !== msg.id);
-      renderPage();
+      updateView();
     }
   };
 }
@@ -162,7 +191,7 @@ function tickClock() {
 }
 
 renderNav();
-renderPage();
+renderPageInner();
 loadItems();
 connectWS();
 tickClock();
