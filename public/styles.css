@@ -1,0 +1,166 @@
+:root {
+  --bg: #0b0d10;
+  --bg-card: #161a1f;
+  --border: #262c33;
+  --text: #eef1f4;
+  --text-dim: #8a92a0;
+  --accent: #4fa3ff;
+  --accent-task: #ffb84f;
+  --accent-idea: #7ee08a;
+  --accent-note: #4fa3ff;
+  --danger: #ff5f5f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 48px 0 48px;
+}
+
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+header .clock {
+  font-size: 1.6rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+nav {
+  display: flex;
+  gap: 12px;
+  padding: 20px 48px 0 48px;
+}
+
+nav .tab {
+  padding: 8px 20px;
+  border-radius: 999px;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  border: 1px solid var(--border);
+}
+
+nav .tab.active {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+main {
+  flex: 1;
+  padding: 32px 48px 48px 48px;
+  overflow-y: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  border-left: 5px solid var(--accent-note);
+}
+
+.card.task { border-left-color: var(--accent-task); }
+.card.idea { border-left-color: var(--accent-idea); }
+.card.note { border-left-color: var(--accent-note); }
+
+.card.done { opacity: 0.45; }
+.card.done .heading { text-decoration: line-through; }
+
+.card .type-tag {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.card .heading {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+}
+
+.card .body {
+  color: var(--text-dim);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.card .checkin {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--accent-task);
+}
+
+.empty-state {
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  padding-top: 60px;
+  text-align: center;
+}
+
+.overview-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  height: 100%;
+}
+
+.overview-columns h2 {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px 0;
+}
+
+.overview-columns .col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.calendar-list .card {
+  border-left-color: var(--accent-task);
+}
+
+.conn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.conn-dot.connected { background: var(--accent-idea); }
