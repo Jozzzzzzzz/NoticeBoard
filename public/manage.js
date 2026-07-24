@@ -74,6 +74,48 @@ async function loadItems() {
   updateItems();
 }
 
+// --- Live sync: WebSocket push (instant) + a 5-minute fallback poll in
+// case the socket ever silently drops, plus a manual sync button. ---
+const syncDot = document.getElementById('sync-dot');
+
+function setSyncStatus(connected) {
+  if (syncDot) syncDot.classList.toggle('connected', connected);
+}
+
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${location.host}`);
+
+  ws.onopen = () => setSyncStatus(true);
+  ws.onclose = () => {
+    setSyncStatus(false);
+    setTimeout(connectWS, 2000);
+  };
+  ws.onerror = () => ws.close();
+
+  ws.onmessage = (evt) => {
+    const msg = JSON.parse(evt.data);
+    if (msg.event === 'item_created' || msg.event === 'item_updated') {
+      const idx = items.findIndex((i) => i.id === msg.item.id);
+      if (idx >= 0) items[idx] = msg.item;
+      else items.unshift(msg.item);
+      updateItems();
+    } else if (msg.event === 'item_deleted') {
+      items = items.filter((i) => i.id !== msg.id);
+      updateItems();
+    }
+  };
+}
+
+const syncBtn = document.getElementById('sync-btn');
+if (syncBtn) {
+  syncBtn.addEventListener('click', async () => {
+    syncBtn.classList.add('spinning');
+    await loadItems();
+    setTimeout(() => syncBtn.classList.remove('spinning'), 400);
+  });
+}
+
 itemsEl.addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-action]');
   if (!btn) return;
@@ -173,3 +215,5 @@ if (SpeechRecognition) {
 }
 
 loadItems();
+connectWS();
+setInterval(loadItems, 5 * 60 * 1000);
