@@ -96,9 +96,9 @@ function renderPageInner() {
   if (currentPage === 'overview') {
     mainEl.innerHTML = `
       <div class="overview-columns">
-        <div class="col"><h2>Tasks</h2>${listOrEmpty(byType('task'))}</div>
-        <div class="col"><h2>Ideas</h2>${listOrEmpty(byType('idea'))}</div>
-        <div class="col"><h2>Notes</h2>${listOrEmpty(byType('note'))}</div>
+        <div class="col"><h2>Tasks</h2><div class="col-cards">${listOrEmpty(byType('task'))}</div></div>
+        <div class="col"><h2>Ideas</h2><div class="col-cards">${listOrEmpty(byType('idea'))}</div></div>
+        <div class="col"><h2>Notes</h2><div class="col-cards">${listOrEmpty(byType('note'))}</div></div>
       </div>`;
     return;
   }
@@ -144,10 +144,46 @@ function renderPageInner() {
   mainEl.innerHTML = `<div class="stack">${listOrEmpty(byType(typeForPage))}</div>`;
 }
 
+// Shrinks a content block to fit inside a given width/height, instead of
+// letting it scroll — used so the TV never shows a scrollbar no matter
+// how many notes are pinned up.
+function fitToBox(el, availW, availH) {
+  if (!el) return;
+  el.style.transform = 'none';
+  const naturalW = el.scrollWidth;
+  const naturalH = el.scrollHeight;
+  if (!naturalW || !naturalH) return;
+  const scale = Math.min(1, availW / naturalW, availH / naturalH);
+  el.style.transformOrigin = 'top center';
+  el.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+}
+
+function fitMainContent() {
+  const cols = mainEl.querySelectorAll('.overview-columns .col');
+  if (cols.length) {
+    cols.forEach((col) => {
+      const heading = col.querySelector('h2');
+      const cardsEl = col.querySelector('.col-cards');
+      const headingH = heading ? heading.offsetHeight + 20 : 0;
+      fitToBox(cardsEl, col.clientWidth, col.clientHeight - headingH);
+    });
+    return;
+  }
+  const stack = mainEl.querySelector('.stack');
+  if (stack) fitToBox(stack, mainEl.clientWidth, mainEl.clientHeight);
+}
+
 function renderPage() {
   renderPageInner();
   tagCardTransitionNames();
+  fitMainContent();
 }
+
+let fitResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(fitResizeTimer);
+  fitResizeTimer = setTimeout(fitMainContent, 150);
+});
 
 function updateView() {
   withViewTransition(renderPage);
